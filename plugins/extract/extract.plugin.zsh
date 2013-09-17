@@ -53,7 +53,7 @@ function extract() {
       (*.lzma) unlzma "$1" ;;
       (*.Z) uncompress "$1" ;;
       (*.zip) unzip "$1" -d $extract_dir ;;
-      (*.rar) unrar e -ad "$1" ;;
+      (*.rar) unrar x -ad "$1" ;;
       (*.7z) 7za x "$1" ;;
       (*.deb)
         mkdir -p "$extract_dir/control"
@@ -77,9 +77,4 @@ function extract() {
 }
 
 alias x=extract
-
-# add extract completion function to path
-fpath=($ZSH/plugins/extract $fpath)
-autoload -U compinit
-compinit -i
 
