@@ -4,17 +4,22 @@ alias bp="bundle package"
 alias bo="bundle open"
 alias bu="bundle update"
 
-if [[ "$(uname)" == 'Darwin' ]]
-then
-  local cores_num="$(sysctl hw.ncpu | awk '{print $2}')"
+bundler_version=`bundle version | cut -d' ' -f3`
+if [[ $bundler_version > '1.4.0' || $bundler_version = '1.4.0' ]]; then
+  if [[ "$(uname)" == 'Darwin' ]]
+  then
+    local cores_num="$(sysctl hw.ncpu | awk '{print $2}')"
+  else
+    local cores_num="$(nproc)"
+  fi
+  eval "alias bi='bundle install --jobs=$cores_num'"
 else
-  local cores_num="$(nproc)"
+  alias bi='bundle install' 
 fi
-eval "alias bi='bundle install --jobs=$cores_num'"
 
 # The following is based on https://github.com/gma/bundler-exec
 
-bundled_commands=(annotate berks cap capify cucumber foodcritic foreman guard jekyll kitchen knife middleman nanoc rackup rainbows rake rspec ruby shotgun spec spin spork strainer tailor thin thor unicorn unicorn_rails puma)
+bundled_commands=(annotate berks cap capify cucumber foodcritic foreman guard jekyll kitchen knife middleman nanoc rackup rainbows rake rspec ruby shotgun spec spin spork strainer tailor taps thin thor unicorn unicorn_rails puma)
 
 ## Functions
 
