@@ -51,7 +51,7 @@ ZSH_THEME="lesterchan"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(aws brew composer docker docker-compose git golang grunt gulp node npm wp-cli)
+plugins=(aws composer docker docker-compose git golang grunt gulp node npm wp-cli)
 
 source $ZSH/oh-my-zsh.sh
 
