@@ -83,7 +83,7 @@ export LC_ALL=en_US.UTF-8
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-# alias zshconfig="mate ~/.zshrc"
+alias wp="wp --allow-root"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 ### User configuration
