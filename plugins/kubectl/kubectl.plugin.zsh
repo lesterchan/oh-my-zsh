@@ -10,7 +10,8 @@ if (( $+commands[kubectl] )); then
     unset __KUBECTL_COMPLETION_FILE
 fi
 
-alias ku=kubectl
+# This command is used a LOT both below and in daily life
+alias k=kubectl
 
 # Execute a kubectl command against all namespaces
 alias kca='f(){ kubectl "$@" --all-namespaces;  unset -f f; }; f'
@@ -26,6 +27,9 @@ alias kcuc='kubectl config use-context'
 alias kcsc='kubectl config set-context'
 alias kcdc='kubectl config delete-context'
 alias kccc='kubectl config current-context'
+
+# List all contexts
+alias kcgc='kubectl config get-contexts'
 
 # General aliases
 alias kdel='kubectl delete'
