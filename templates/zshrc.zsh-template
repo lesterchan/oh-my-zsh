@@ -103,6 +103,7 @@ alias grep="ripgrep"
 alias find="fd"
 alias ls="exa"
 alias ps="procs"
+alias myip="curl http://ipecho.net/plain; echo"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 ### User configuration
