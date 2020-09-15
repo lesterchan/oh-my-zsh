@@ -43,6 +43,12 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
+#### via fetch
+
+```shell
+sh -c "$(fetch -o - https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
 #### Manual inspection
 
 It's a good idea to inspect the install script from projects you don't yet know. You can do
@@ -86,7 +92,7 @@ _Note that the plugins are separated by whitespace (spaces, tabs, new lines...).
 
 #### Using Plugins
 
-Each plugin includes a __README__, documenting it. This README should show the aliases (if the plugin adds any) and extra goodies that are inclued in that particular plugin.
+Each plugin includes a __README__, documenting it. This README should show the aliases (if the plugin adds any) and extra goodies that are included in that particular plugin.
 
 ### Themes
 
@@ -267,7 +273,7 @@ DISABLE_AUTO_UPDATE=true
 If you'd like to upgrade at any point in time (maybe someone just released a new plugin and you don't want to wait a week?) you just need to run:
 
 ```shell
-upgrade_oh_my_zsh
+omz update
 ```
 
 Magic! 🎉
