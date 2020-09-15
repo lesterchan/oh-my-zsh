@@ -98,9 +98,6 @@ export LC_ALL=en_US.UTF-8
 #
 # Example aliases
 alias wp="wp --allow-root"
-alias cat="bat"
-alias grep="rg"
-alias find="fd"
 alias ls="exa"
 alias ps="procs"
 alias myip="curl http://ipecho.net/plain; echo"
