@@ -100,7 +100,7 @@ alias gcf='git config --list'
 
 function gccd() {
   command git clone --recurse-submodules "$@"
-  [[ -d "$_" ]] && cd "$_" || cd "${${_:h}%.git}"
+  [[ -d "$_" ]] && cd "$_" || cd "${${_:t}%.git}"
 }
 compdef _git gccd=git-clone
 
@@ -251,6 +251,7 @@ alias grbc='git rebase --continue'
 alias grbd='git rebase $(git_develop_branch)'
 alias grbi='git rebase -i'
 alias grbm='git rebase $(git_main_branch)'
+alias grbom='git rebase origin/$(git_main_branch)'
 alias grbo='git rebase --onto'
 alias grbs='git rebase --skip'
 alias grev='git revert'
@@ -295,6 +296,8 @@ alias gstall='git stash --all'
 alias gsu='git submodule update'
 alias gsw='git switch'
 alias gswc='git switch -c'
+alias gswm='git switch $(git_main_branch)'
+alias gswd='git switch $(git_develop_branch)'
 
 alias gts='git tag -s'
 alias gtv='git tag | sort -V'
