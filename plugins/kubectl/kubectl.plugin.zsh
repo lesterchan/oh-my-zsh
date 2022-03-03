@@ -11,11 +11,11 @@ if (( $+commands[kubectl] )); then
   # If the completion file does not exist, generate it and then source it
   # Otherwise, source it and regenerate in the background
   if [[ ! -f "$ZSH_CACHE_DIR/completions/_kubectl" ]]; then
-    kubectl completion zsh >| "$ZSH_CACHE_DIR/completions/_kubectl"
+    kubectl completion zsh | tee "$ZSH_CACHE_DIR/completions/_kubectl" >/dev/null
     source "$ZSH_CACHE_DIR/completions/_kubectl"
   else
     source "$ZSH_CACHE_DIR/completions/_kubectl"
-    kubectl completion zsh >| "$ZSH_CACHE_DIR/completions/_kubectl" &|
+    kubectl completion zsh | tee "$ZSH_CACHE_DIR/completions/_kubectl" >/dev/null &|
   fi
 fi
 
@@ -29,7 +29,7 @@ alias kca='_kca(){ kubectl "$@" --all-namespaces;  unset -f _kca; }; _kca'
 alias kaf='kubectl apply -f'
 
 # Drop into an interactive terminal on a container
-alias keti='kubectl exec -ti'
+alias keti='kubectl exec -t -i'
 
 # Manage configuration quickly to switch contexts between local, dev ad staging.
 alias kcuc='kubectl config use-context'
