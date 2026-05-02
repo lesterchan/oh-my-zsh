@@ -4,7 +4,7 @@
 #
 # https://github.com/agkozak/zsh-z
 #
-# Copyright (c) 2018-2025 Alexandros Kozak
+# Copyright (c) 2018-2026 Alexandros Kozak
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -294,9 +294,9 @@ zshz() {
     owner=${ZSHZ_OWNER:-${_Z_OWNER}}
 
     if (( ZSHZ[USE_FLOCK] )); then
-      # An unsual case: if inside Docker container where datafile could be bind
+      # An unusual case: if inside Docker container where datafile could be bind
       # mounted
-      if [[ -r '/proc/1/cgroup' && "$(< '/proc/1/cgroup')" == *docker* ]]; then
+      if [[ -f '/.dockerenv' || ( -r '/proc/1/cgroup' && "$(< '/proc/1/cgroup')" == *docker* ) ]]; then
         print "$(< "$tempfile")" > "$datafile" 2> /dev/null
         ${ZSHZ[RM]} -f "$tempfile"
       # All other cases
@@ -960,6 +960,72 @@ add-zsh-hook chpwd _zshz_chpwd
 
 (( ${fpath[(ie)${0:A:h}]} <= ${#fpath} )) || fpath=( "${0:A:h}" "${fpath[@]}" )
 
+
+# Save the existing Tab binding so that the completion widget can invoke it,
+# but being careful not to create a situation where the widget ends up calling
+# itself and causing infinite recursion if this script is re-sourced.
+if (( ! ${+widgets[_zshz_zle_completion_widget]} )); then
+  ZSHZ[TAB_BINDING]="${$(bindkey -M main '^I')##* }"
+fi
+
+############################################################
+# ZLE widget to fix spaces-as-wildcards completion
+#
+# When completing a Zsh-z command with multiple search terms
+# (e.g. `z us lo bi'), collapse the terms into a single
+# wildcard-joined word (e.g. `z us*lo*bi') before triggering
+# completion. This causes compadd to replace the whole query
+# with the matched path rather than just the last word.
+#
+# Globals:
+#   ZSHZ_CMD
+############################################################
+_zshz_zle_completion_widget() {
+
+  setopt LOCAL_OPTIONS EXTENDED_GLOB NO_KSH_ARRAYS NO_SH_WORD_SPLIT
+
+  local cmd=${ZSHZ_CMD:-${_Z_CMD:-z}}
+
+  # If a trailing space was added after an already-completed absolute path
+  # (e.g. `z /usr/local/bin '), a second Tab would otherwise re-trigger
+  # completion on an empty word and insert a duplicate. Bail out early.
+  if [[ $LBUFFER[-1] == ' ' && ${${LBUFFER% }##* } == [/~]* ]]; then
+    return
+  fi
+
+  # Only act when there are at least two words after the command
+  if [[ $LBUFFER == ${cmd}\ *\ * ]]; then
+    local after=${LBUFFER#${cmd} }
+    local -a parts flag_parts search_parts
+    local p past_flags=0
+
+    parts=( ${(z)after} )
+    for p in $parts; do
+      if (( ! past_flags )) && [[ $p == (-[cehlrRtx]##|--add|--complete|--help) ]]; then
+        flag_parts+=( $p )
+      else
+        past_flags=1
+        search_parts+=( $p )
+      fi
+    done
+
+    if (( ${#search_parts} > 1 )); then
+      LBUFFER="${cmd}${flag_parts:+ ${(j: :)flag_parts}} ${(j:*:)search_parts}"
+    fi
+  fi
+
+  # If Tab had a non-default binding, continue to use it; otherwise the default
+  # expand-or-complete gets used.
+  zle ${ZSHZ[TAB_BINDING]:-expand-or-complete}
+}
+
+# Register the widget and bind to Tab, but only if this script has not already
+# been sourced -- avoid infinite recursion.
+if (( ! ${+widgets[_zshz_zle_completion_widget]} )); then
+  zle -N _zshz_zle_completion_widget
+  bindkey -M main '^I' _zshz_zle_completion_widget
+fi
+
 ############################################################
 # zsh-z functions
 ############################################################
@@ -974,7 +1040,8 @@ ZSHZ[FUNCTIONS]='_zshz_usage
                  zshz
                  _zshz_precmd
                  _zshz_chpwd
-                 _zshz'
+                 _zshz
+                 _zshz_zle_completion_widget'
 
 ############################################################
 # Enable WARN_NESTED_VAR for functions listed in
@@ -1003,6 +1070,16 @@ zsh-z_plugin_unload() {
 
   add-zsh-hook -D precmd _zshz_precmd
   add-zsh-hook -d chpwd _zshz_chpwd
+
+  zle -D _zshz_zle_completion_widget
+
+  # Only restore Tab binding if it is still bound to our widget; otherwise
+  # leave it alone.
+  local _zshz_current_tab
+  _zshz_current_tab="$(bindkey -M main '^I' 2>/dev/null || true)"
+  if [[ ${_zshz_current_tab##* } == _zshz_zle_completion_widget ]]; then
+    bindkey -M main '^I' "${ZSHZ[TAB_BINDING]:-expand-or-complete}"
+  fi
 
   local x
   for x in ${=ZSHZ[FUNCTIONS]}; do

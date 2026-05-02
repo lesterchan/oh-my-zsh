@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "0 6 * * 0"
 
+permissions:
+  contents: read
+
 jobs:
   check:
     name: Check for updates
@@ -13,7 +16,7 @@ jobs:
       contents: write # this is needed to push commits and branches
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
         with:
           egress-policy: audit
 
@@ -23,9 +26,9 @@ jobs:
           fetch-depth: 0
       - name: Authenticate as @ohmyzsh
         id: generate-token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         with:
-          app-id: ${{ secrets.OHMYZSH_APP_ID }}
+          client-id: ${{ secrets.OHMYZSH_CLIENT_ID }}
           private-key: ${{ secrets.OHMYZSH_APP_PRIVATE_KEY }}
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
